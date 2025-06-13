@@ -58,8 +58,8 @@ export default function ServicePage({ params }: ServicePageProps) {
 
   return (
     <main>
-      <NotificationBar />
-      <Navbar />
+      {/* <NotificationBar />
+      <Navbar /> */}
       <ServiceDetail
         title={service.title}
         description={service.description}
@@ -68,7 +68,7 @@ export default function ServicePage({ params }: ServicePageProps) {
       />
       <Testimonials />
       <DeliveryArea />
-      <Footer />
+      {/* <Footer /> */}
     </main>
   )
 }

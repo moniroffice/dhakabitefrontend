@@ -64,7 +64,7 @@ export default function Navbar() {
         <div className="container-custom flex justify-between items-center">
           {/* Logo */}
           <Link href="/" className="flex items-center">
-            <span className="text-secondary text-2xl font-bold">dhakabite</span>
+            <span className="text-secondary text-2xl font-bold">dhaka bite</span>
           </Link>
 
           {/* Desktop Navigation */}
@@ -86,7 +86,7 @@ export default function Navbar() {
             </Link>
           </div>
 
-          {/* User Actions */}
+          {/* User Actions - Desktop */}
           <div className="hidden md:flex items-center space-x-4">
             {/* Check Balance - Only show if authenticated */}
             {isAuthenticated && (
@@ -150,10 +150,25 @@ export default function Navbar() {
             )}
           </div>
 
-          {/* Mobile Menu Button */}
-          <button className="md:hidden text-primary" onClick={() => setIsMenuOpen(!isMenuOpen)}>
-            {isMenuOpen ? <X size={24} /> : <Menu size={24} />}
-          </button>
+          {/* Mobile Actions - Cart and Menu Button */}
+          <div className="md:hidden flex items-center space-x-4">
+            {/* Cart - Always visible on mobile */}
+            <div className="relative">
+              <button onClick={toggleCart} className="flex items-center">
+                <ShoppingCart className={isActive("/cart") ? "text-secondary" : "text-primary"} />
+                {totalItems > 0 && (
+                  <span className="absolute -top-2 -right-2 bg-secondary text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">
+                    {totalItems}
+                  </span>
+                )}
+              </button>
+            </div>
+
+            {/* Mobile Menu Button */}
+            <button className="text-primary" onClick={() => setIsMenuOpen(!isMenuOpen)}>
+              {isMenuOpen ? <X size={24} /> : <Menu size={24} />}
+            </button>
+          </div>
         </div>
 
         {/* Mobile Menu */}
@@ -192,20 +207,6 @@ export default function Navbar() {
                     <span>Balance: ৳{user?.balance?.toLocaleString() || "0"}</span>
                   </button>
                 )}
-
-                {/* Cart - Mobile */}
-                <button
-                  onClick={() => {
-                    setIsMenuOpen(false)
-                    toggleCart()
-                  }}
-                  className={`flex items-center gap-1 ${
-                    isActive("/cart") ? "text-secondary" : "text-primary"
-                  } w-full py-2`}
-                >
-                  <ShoppingCart size={16} />
-                  <span>Cart ({totalItems})</span>
-                </button>
 
                 {/* Authentication - Mobile */}
                 {!isAuthenticated ? (

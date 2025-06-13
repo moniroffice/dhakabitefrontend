@@ -23,7 +23,7 @@ const menuPackages = [
     ],
     popular: false,
     savings: "Save ৳15",
-    deliveryTime: "30-45 mins",
+    //deliveryTime: "30-45 mins",
     serves: "1 Person",
   },
   {
@@ -44,7 +44,7 @@ const menuPackages = [
     ],
     popular: true,
     savings: "Save ৳20",
-    deliveryTime: "25-40 mins",
+    //deliveryTime: "25-40 mins",
     serves: "1 Person",
   },
   {
@@ -65,7 +65,7 @@ const menuPackages = [
     ],
     popular: false,
     savings: "Save ৳30",
-    deliveryTime: "20-35 mins",
+    //deliveryTime: "20-35 mins",
     serves: "1 Person",
   },
 ]
@@ -152,10 +152,10 @@ export default function MenuPackages() {
 
                   {/* Quick Info */}
                   <div className="flex justify-between items-center mb-4 text-xs text-gray-600">
-                    <div className="flex items-center">
+                    {/* <div className="flex items-center">
                       <Clock size={12} className="mr-1" />
-                      <span>{menu.deliveryTime}</span>
-                    </div>
+                      <span>{menu.//deliveryTime}</span>
+                    </div> */}
                     <div className="flex items-center">
                       <Users size={12} className="mr-1" />
                       <span>{menu.serves}</span>

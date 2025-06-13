@@ -12,11 +12,11 @@ export default function HeroSection() {
   // Carousel images
   const carouselImages = ["/food-plate.jpg", "/bengali-food-platter.jpg", "/food-spread-overhead.jpg"]
 
-  // Auto-change images every 3 seconds
+  // Auto-change images every 4 seconds
   useEffect(() => {
     const interval = setInterval(() => {
       setCurrentImageIndex((prevIndex) => (prevIndex === carouselImages.length - 1 ? 0 : prevIndex + 1))
-    }, 3000)
+    }, 4000)
 
     return () => clearInterval(interval)
   }, [carouselImages.length])
@@ -49,32 +49,54 @@ export default function HeroSection() {
   }
 
   return (
-    <section className="bg-secondary py-16 md:py-24">
-      <div className="container-custom">
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12 items-center">
-          {/* Left Content */}
-          <div className="order-2 lg:order-1">
-            <h1 className="text-4xl md:text-5xl font-bold text-black mb-6">
-              Healthy, affordable meals that taste like home — only at <span className="text-primary">Dhaka Bite.</span>
+    <section className="relative w-full h-screen overflow-hidden">
+      {/* Background Carousel Images */}
+      <div className="absolute inset-0 w-full h-full">
+        {carouselImages.map((image, index) => (
+          <div
+            key={index}
+            className={`absolute inset-0 w-full h-full transition-opacity duration-1000 ease-in-out ${
+              index === currentImageIndex ? "opacity-100" : "opacity-0"
+            }`}
+          >
+            <img
+              src={image || "/placeholder.svg"}
+              alt={`Food background ${index + 1}`}
+              className="w-full h-full object-cover"
+            />
+          </div>
+        ))}
+      </div>
+
+      {/* Dark Overlay for better text readability */}
+      <div className="absolute inset-0 bg-black/40"></div>
+
+      {/* Content Overlay */}
+      <div className="relative z-10 h-full flex items-center">
+        <div className="container-custom">
+          <div className="max-w-2xl">
+            <h1 className="text-4xl md:text-6xl lg:text-7xl font-bold text-white mb-6 leading-tight">
+              Healthy, affordable meals that taste like home — only at{" "}
+              <span className="text-secondary">Dhaka Bite.</span>
             </h1>
 
-            <p className="text-black mb-6">
-              At <span className="font-medium">Dhaka Bite</span>, we believe everyone deserves the warmth of a homemade
-              meal—whether you're working late, living alone, or simply craving something real. We offer affordable,
-              tasty, and hygienic lunch & dinner packages delivered right to your doorstep.
+            {/* <p className="text-white/90 text-lg md:text-xl mb-6 leading-relaxed">
+              At <span className="font-medium text-secondary">Dhaka Bite</span>, we believe everyone deserves the warmth
+              of a homemade meal—whether you're working late, living alone, or simply craving something real. We offer
+              affordable, tasty, and hygienic lunch & dinner packages delivered right to your doorstep.
             </p>
 
-            <p className="text-black font-medium mb-8">"Your satisfaction is our recipe!"</p>
+            <p className="text-secondary font-medium text-xl mb-8">"Your satisfaction is our recipe!"</p> */}
 
             <div className="flex flex-col sm:flex-row gap-4 mb-12">
-              <Link href="/all-package/foods" className="btn-primary">
+              <Link href="/all-package/foods" className="btn-primary text-lg px-8 py-4">
                 Order Now
               </Link>
               <button
                 onClick={handleContactClick}
-                className="btn-outline flex items-center justify-center gap-2 relative"
+                className="bg-white/10 backdrop-blur-sm text-white border border-white/30 font-medium py-4 px-8 rounded-md hover:bg-white/20 transition-all flex items-center justify-center gap-2 relative text-lg"
               >
-                <Phone size={16} />
+                <Phone size={20} />
                 <span>Contact Now</span>
                 {showCopiedMessage && (
                   <div className="absolute -top-12 left-1/2 transform -translate-x-1/2 bg-green-600 text-white px-3 py-1 rounded-md text-sm whitespace-nowrap z-10">
@@ -87,81 +109,60 @@ export default function HeroSection() {
             <div className="flex gap-4">
               <Link
                 href="https://facebook.com"
-                className="bg-primary text-white p-2 rounded-md hover:bg-opacity-90 transition-colors"
+                className="bg-white/10 backdrop-blur-sm text-white p-3 rounded-md hover:bg-white/20 transition-colors border border-white/30"
                 target="_blank"
                 rel="noopener noreferrer"
               >
-                <Facebook size={20} />
+                <Facebook size={24} />
               </Link>
               <Link
                 href="https://instagram.com"
-                className="bg-primary text-white p-2 rounded-md hover:bg-opacity-90 transition-colors"
+                className="bg-white/10 backdrop-blur-sm text-white p-3 rounded-md hover:bg-white/20 transition-colors border border-white/30"
                 target="_blank"
                 rel="noopener noreferrer"
               >
-                <Instagram size={20} />
+                <Instagram size={24} />
               </Link>
               <Link
                 href="https://tiktok.com"
-                className="bg-primary text-white p-2 rounded-md hover:bg-opacity-90 transition-colors"
+                className="bg-white/10 backdrop-blur-sm text-white p-3 rounded-md hover:bg-white/20 transition-colors border border-white/30"
                 target="_blank"
                 rel="noopener noreferrer"
               >
-                <Music size={20} />
+                <Music size={24} />
               </Link>
             </div>
           </div>
-
-          {/* Right Carousel */}
-          <div className="order-1 lg:order-2">
-            <div className="relative w-full h-[400px] md:h-[500px] rounded-lg overflow-hidden shadow-lg">
-              {/* Carousel Images */}
-              <div className="relative w-full h-full">
-                {carouselImages.map((image, index) => (
-                  <div
-                    key={index}
-                    className={`absolute inset-0 transition-opacity duration-500 ease-in-out ${
-                      index === currentImageIndex ? "opacity-100" : "opacity-0"
-                    }`}
-                  >
-                    <img
-                      src={image || "/placeholder.svg"}
-                      alt={`Food carousel ${index + 1}`}
-                      className="w-full h-full object-cover"
-                    />
-                  </div>
-                ))}
-              </div>
-
-              {/* Navigation Arrows */}
-              <button
-                onClick={prevImage}
-                className="absolute left-4 top-1/2 transform -translate-y-1/2 bg-black/50 text-white p-2 rounded-full hover:bg-black/70 transition-colors"
-              >
-                <ChevronLeft size={20} />
-              </button>
-              <button
-                onClick={nextImage}
-                className="absolute right-4 top-1/2 transform -translate-y-1/2 bg-black/50 text-white p-2 rounded-full hover:bg-black/70 transition-colors"
-              >
-                <ChevronRight size={20} />
-              </button>
-
-              {/* Dots Indicator */}
-              <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2 flex space-x-2">
-                {carouselImages.map((_, index) => (
-                  <button
-                    key={index}
-                    onClick={() => setCurrentImageIndex(index)}
-                    className={`w-3 h-3 rounded-full transition-colors ${
-                      index === currentImageIndex ? "bg-white" : "bg-white/50"
-                    }`}
-                  />
-                ))}
-              </div>
-            </div>
-          </div>
         </div>
+      </div>
+
+      {/* Navigation Arrows */}
+      <button
+        onClick={prevImage}
+        className="absolute left-6 top-1/2 transform -translate-y-1/2 bg-white/20 backdrop-blur-sm text-white p-3 rounded-full hover:bg-white/30 transition-colors z-20 border border-white/30"
+      >
+        <ChevronLeft size={24} />
+      </button>
+      <button
+        onClick={nextImage}
+        className="absolute right-6 top-1/2 transform -translate-y-1/2 bg-white/20 backdrop-blur-sm text-white p-3 rounded-full hover:bg-white/30 transition-colors z-20 border border-white/30"
+      >
+        <ChevronRight size={24} />
+      </button>
+
+      {/* Dots Indicator */}
+      <div className="absolute bottom-8 left-1/2 transform -translate-x-1/2 flex space-x-3 z-20">
+        {carouselImages.map((_, index) => (
+          <button
+            key={index}
+            onClick={() => setCurrentImageIndex(index)}
+            className={`w-4 h-4 rounded-full transition-all border-2 ${
+              index === currentImageIndex
+                ? "bg-secondary border-secondary"
+                : "bg-white/30 border-white/50 hover:bg-white/50"
+            }`}
+          />
+        ))}
       </div>
     </section>
   )

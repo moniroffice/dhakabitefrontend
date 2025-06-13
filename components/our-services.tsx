@@ -302,12 +302,12 @@ export default function OurServices() {
   return (
     <section className="py-16 bg-white">
       <div className="container-custom">
-        <h2 className="text-3xl font-bold text-center mb-6">Our Services</h2>
+        {/* <h2 className="text-3xl font-bold text-center mb-6">Our Services</h2>
         <p className="text-center mb-12 max-w-3xl mx-auto">
           At Dhaka Bite, we provide freshly prepared, home-style meals through three convenient options Basic, Standard,
           and Premium Menu. All our meals are cooked with care, delivered on time, and we never compromise on hygiene or
           taste.
-        </p>
+        </p> */}
 
         <PackageSection items={basicMenuItems} type="Basic" />
         <PackageSection items={standardMenuItems} type="Standard" />
