@@ -23,8 +23,6 @@ const menuPackages = [
     ],
     popular: false,
     savings: "Save ৳15",
-    //deliveryTime: "30-45 mins",
-    serves: "1 Person",
   },
   {
     id: "standard",
@@ -44,8 +42,6 @@ const menuPackages = [
     ],
     popular: true,
     savings: "Save ৳20",
-    //deliveryTime: "25-40 mins",
-    serves: "1 Person",
   },
   {
     id: "premium",
@@ -65,9 +61,8 @@ const menuPackages = [
     ],
     popular: false,
     savings: "Save ৳30",
-    //deliveryTime: "20-35 mins",
-    serves: "1 Person",
   },
+  
 ]
 
 export default function MenuPackages() {
@@ -115,31 +110,13 @@ export default function MenuPackages() {
                   className="relative h-32 md:h-40 bg-cover bg-center"
                   style={{ backgroundImage: `url('${menu.bgImage}')` }}
                 >
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent"></div>
-
-                  {/* Food Image */}
-                  <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2 translate-y-1/2">
-                    <div className="w-16 h-16 md:w-20 md:h-20 rounded-full border-4 border-white shadow-lg overflow-hidden bg-white">
-                      <Image
-                        src={menu.image || "/placeholder.svg"}
-                        alt={menu.name}
-                        width={80}
-                        height={80}
-                        className="w-full h-full object-cover"
-                      />
-                    </div>
-                  </div>
+                             
                 </div>
 
                 {/* Card Content */}
                 <div className="pt-10 md:pt-12 pb-6 px-4 md:px-6">
                   {/* Menu Name */}
                   <h3 className="text-lg md:text-xl font-bold text-center mb-2 text-gray-900">{menu.name}</h3>
-
-                  {/* Description */}
-                  <p className="text-xs md:text-sm text-gray-600 text-center mb-4 leading-relaxed">
-                    {menu.description}
-                  </p>
 
                   {/* Price Section */}
                   <div className="text-center mb-4">
@@ -148,19 +125,7 @@ export default function MenuPackages() {
                       <span className="text-sm md:text-base text-gray-400 line-through">৳{menu.originalPrice}</span>
                     </div>
                     <p className="text-xs text-gray-500">Per meal</p>
-                  </div>
-
-                  {/* Quick Info */}
-                  <div className="flex justify-between items-center mb-4 text-xs text-gray-600">
-                    {/* <div className="flex items-center">
-                      <Clock size={12} className="mr-1" />
-                      <span>{menu.//deliveryTime}</span>
-                    </div> */}
-                    <div className="flex items-center">
-                      <Users size={12} className="mr-1" />
-                      <span>{menu.serves}</span>
-                    </div>
-                  </div>
+                  </div>             
 
                   {/* Features List */}
                   <div className="space-y-1 mb-6">
