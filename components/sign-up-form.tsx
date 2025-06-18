@@ -1,7 +1,7 @@
 "use client"
 
 import type React from "react"
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import Link from "next/link"
 import { Eye, EyeOff } from "lucide-react"
 import { useToast } from "@/hooks/use-toast"
@@ -9,6 +9,9 @@ import { useRouter } from "next/navigation"
 import { useDispatch } from "react-redux"
 import { setCredentials } from "@/store/slices/authSlice"
 import { useRegisterMutation } from "@/store/api/authApi"
+import { baseApi } from "@/store/api/baseApi"
+
+
 
 export default function SignUpForm() {
   const router = useRouter()
@@ -23,6 +26,7 @@ export default function SignUpForm() {
     confirmPassword: "",
     phone: "",
   })
+  const [areas, setAreas] = useState([])
   const [showPassword, setShowPassword] = useState(false)
   const [showConfirmPassword, setShowConfirmPassword] = useState(false)
   const [termsAccepted, setTermsAccepted] = useState(true)
@@ -31,7 +35,24 @@ export default function SignUpForm() {
   const dispatch = useDispatch()
   const [registerMutation] = useRegisterMutation()
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  useEffect(() => {
+   const fetchAreas = async () => {
+  try {
+    const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api'}/delivery-area`)
+    const data = await res.json()
+    if (data.status) {
+      setAreas(data.data)
+    }
+  } catch (error) {
+    console.error("Failed to fetch delivery areas", error)
+  }
+}
+
+
+    fetchAreas()
+  }, [])
+
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const { name, value } = e.target
     setFormData((prev) => ({
       ...prev,
@@ -67,6 +88,7 @@ export default function SignUpForm() {
         name: formData.name,
         email: formData.email,
         password: formData.password,
+        confirmPassword: formData.confirmPassword,
         phone: formData.phone,
         area: formData.area,
         address: formData.address,
@@ -75,16 +97,14 @@ export default function SignUpForm() {
 
       const result = await registerMutation(registerData).unwrap()
 
-      if (!result?.user || !result?.token) throw new Error("Registration failed.")
-
-      dispatch(setCredentials({ user: result.user, token: result.token }))
+      if (!result?.data) throw new Error("Registration failed.")
 
       toast({
-        title: "Account created",
-        description: "Your account has been successfully created!",
+        title: "Success",
+        description: result.message || "Account created successfully.",
       })
 
-      router.push("/verify-otp")
+      router.push(`/verify-mail/${result.data.email}`)
     } catch (error: any) {
       toast({
         title: "Error",
@@ -112,9 +132,9 @@ export default function SignUpForm() {
         {[
           { id: "name", label: "Name", type: "text", required: true },
           { id: "email", label: "Email", type: "email", required: true },
-          { id: "area", label: "Area", type: "text", required: true },
           { id: "address", label: "Address", type: "text", required: true },
           { id: "referenceCode", label: "Reference Code", type: "text", required: false },
+          { id: "phone", label: "Phone", type: "text", required: true },
         ].map((field) => (
           <div key={field.id}>
             <label htmlFor={field.id} className="block text-gray-700 font-medium mb-1">
@@ -132,6 +152,28 @@ export default function SignUpForm() {
             />
           </div>
         ))}
+
+        {/* Area dropdown */}
+        <div>
+          <label htmlFor="area" className="block text-gray-700 font-medium mb-1">
+            Want to take food delivery <span className="text-red-500">*</span>
+          </label>
+          <select
+            id="area"
+            name="area"
+            value={formData.area}
+            onChange={handleChange}
+            required
+            className="w-full px-4 py-3 border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-primary"
+          >
+            <option value="">Select Area</option>
+            {areas.map((area: any, index) => (
+              <option key={index} value={area.areaName}>
+                {area.areaName}
+              </option>
+            ))}
+          </select>
+        </div>
 
         {/* Password */}
         <div>

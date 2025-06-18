@@ -1,23 +1,26 @@
 "use client"
 
 import Link from "next/link"
-import { Facebook, Instagram, Music, Phone, ChevronLeft, ChevronRight } from "lucide-react"
-import { useState, useEffect } from "react"
+import { Facebook, Instagram, Phone, ChevronLeft, ChevronRight } from "lucide-react"
+import { SiTiktok } from "react-icons/si"
+import { useEffect, useState } from "react"
+import { useGetHeroImagesQuery } from "@/store/api/heroImageApi"
 
 export default function HeroSection() {
   const [showCopiedMessage, setShowCopiedMessage] = useState(false)
   const [currentImageIndex, setCurrentImageIndex] = useState(0)
   const phoneNumber = "01400650261"
 
-  // Carousel images
-  const carouselImages = ["/food-plate.jpg", "/bengali-food-platter.jpg", "/food-spread-overhead.jpg"]
+  const { data, isLoading } = useGetHeroImagesQuery()
+  const carouselImages = data?.data || []
 
-  // Auto-change images every 4 seconds
   useEffect(() => {
+    if (!carouselImages.length) return
     const interval = setInterval(() => {
-      setCurrentImageIndex((prevIndex) => (prevIndex === carouselImages.length - 1 ? 0 : prevIndex + 1))
+      setCurrentImageIndex((prevIndex) =>
+        prevIndex === carouselImages.length - 1 ? 0 : prevIndex + 1
+      )
     }, 4000)
-
     return () => clearInterval(interval)
   }, [carouselImages.length])
 
@@ -25,27 +28,28 @@ export default function HeroSection() {
     try {
       await navigator.clipboard.writeText(phoneNumber)
       setShowCopiedMessage(true)
-
-      // Hide the message after 3 seconds
-      setTimeout(() => {
-        setShowCopiedMessage(false)
-      }, 3000)
-
-      // Also initiate phone call
+      setTimeout(() => setShowCopiedMessage(false), 3000)
       window.location.href = `tel:${phoneNumber}`
     } catch (err) {
       console.error("Failed to copy phone number:", err)
-      // Fallback: still try to initiate phone call
       window.location.href = `tel:${phoneNumber}`
     }
   }
 
   const nextImage = () => {
-    setCurrentImageIndex((prevIndex) => (prevIndex === carouselImages.length - 1 ? 0 : prevIndex + 1))
+    setCurrentImageIndex((prevIndex) =>
+      prevIndex === carouselImages.length - 1 ? 0 : prevIndex + 1
+    )
   }
 
   const prevImage = () => {
-    setCurrentImageIndex((prevIndex) => (prevIndex === 0 ? carouselImages.length - 1 : prevIndex - 1))
+    setCurrentImageIndex((prevIndex) =>
+      prevIndex === 0 ? carouselImages.length - 1 : prevIndex - 1
+    )
+  }
+
+  if (isLoading) {
+    return <p className="text-center text-white text-xl mt-10">Loading hero images...</p>
   }
 
   return (
@@ -54,39 +58,31 @@ export default function HeroSection() {
       <div className="absolute inset-0 w-full h-full">
         {carouselImages.map((image, index) => (
           <div
-            key={index}
+            key={image._id}
             className={`absolute inset-0 w-full h-full transition-opacity duration-1000 ease-in-out ${
               index === currentImageIndex ? "opacity-100" : "opacity-0"
             }`}
           >
             <img
-              src={image || "/placeholder.svg"}
-              alt={`Food background ${index + 1}`}
+              src={image.image || "/placeholder.svg"}
+              alt={image.title || `Hero image ${index + 1}`}
               className="w-full h-full object-cover"
             />
           </div>
         ))}
       </div>
 
-      {/* Dark Overlay for better text readability */}
+      {/* Dark Overlay */}
       <div className="absolute inset-0 bg-black/40"></div>
 
-      {/* Content Overlay */}
-      <div className="relative z-30 h-full flex items-center">
+      {/* Content */}
+      <div className="relative z-30 h-full flex items-center justify-start">
         <div className="container-custom">
-          <div className="max-w-2xl">
+          <div className="max-w-4xl">
             <h1 className="text-4xl md:text-6xl lg:text-7xl font-bold text-white mb-6 leading-tight">
               Healthy, affordable meals that taste like home — only at{" "}
               <span className="text-secondary">Dhaka Bite.</span>
             </h1>
-
-            {/* <p className="text-white/90 text-lg md:text-xl mb-6 leading-relaxed">
-              At <span className="font-medium text-secondary">Dhaka Bite</span>, we believe everyone deserves the warmth
-              of a homemade meal—whether you're working late, living alone, or simply craving something real. We offer
-              affordable, tasty, and hygienic lunch & dinner packages delivered right to your doorstep.
-            </p>
-
-            <p className="text-secondary font-medium text-xl mb-8">"Your satisfaction is our recipe!"</p> */}
 
             <div className="flex flex-col sm:flex-row gap-4 mb-12">
               <Link href="/all-package/foods" className="btn-primary text-lg px-8 py-4">
@@ -108,7 +104,7 @@ export default function HeroSection() {
 
             <div className="flex gap-4">
               <Link
-                href="https://facebook.com"
+                href="https://www.facebook.com/share/1BBhiDmhEj/"
                 className="bg-white/10 backdrop-blur-sm text-white p-3 rounded-md hover:bg-white/20 transition-colors border border-white/30"
                 target="_blank"
                 rel="noopener noreferrer"
@@ -116,7 +112,7 @@ export default function HeroSection() {
                 <Facebook size={24} />
               </Link>
               <Link
-                href="https://instagram.com"
+                href="https://www.instagram.com/dhakabite?igsh=MXNpNzN3ejJwZzExdw=="
                 className="bg-white/10 backdrop-blur-sm text-white p-3 rounded-md hover:bg-white/20 transition-colors border border-white/30"
                 target="_blank"
                 rel="noopener noreferrer"
@@ -124,12 +120,12 @@ export default function HeroSection() {
                 <Instagram size={24} />
               </Link>
               <Link
-                href="https://tiktok.com"
+                href="https://www.tiktok.com/@dhaka_bite?_t=ZS-8wsWsjYPj8i&_r=1"
                 className="bg-white/10 backdrop-blur-sm text-white p-3 rounded-md hover:bg-white/20 transition-colors border border-white/30"
                 target="_blank"
                 rel="noopener noreferrer"
               >
-                <Music size={24} />
+                <SiTiktok size={24} />
               </Link>
             </div>
           </div>
@@ -139,13 +135,13 @@ export default function HeroSection() {
       {/* Navigation Arrows */}
       <button
         onClick={prevImage}
-        className="absolute left-6 top-1/2 transform -translate-y-1/2 bg-white/20 backdrop-blur-sm text-white p-3 rounded-full hover:bg-white/30 transition-colors z-20 border border-white/30"
+        className="hidden sm:flex absolute left-6 top-1/2 transform -translate-y-1/2 bg-white/20 backdrop-blur-sm text-white p-3 rounded-full hover:bg-white/30 transition-colors z-20 border border-white/30"
       >
         <ChevronLeft size={24} />
       </button>
       <button
         onClick={nextImage}
-        className="absolute right-6 top-1/2 transform -translate-y-1/2 bg-white/20 backdrop-blur-sm text-white p-3 rounded-full hover:bg-white/30 transition-colors z-20 border border-white/30"
+        className="hidden sm:flex absolute right-6 top-1/2 transform -translate-y-1/2 bg-white/20 backdrop-blur-sm text-white p-3 rounded-full hover:bg-white/30 transition-colors z-20 border border-white/30"
       >
         <ChevronRight size={24} />
       </button>

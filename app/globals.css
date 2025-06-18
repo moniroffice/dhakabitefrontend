@@ -121,4 +121,7 @@ body {
   .container-custom {
     @apply max-w-7xl mx-auto px-4 sm:px-6 lg:px-8;
   }
+  .btn-primary-gradient {
+    @apply w-full bg-gradient-to-r from-primary to-green-600 text-white rounded-lg font-semibold text-sm md:text-base transition-all duration-300 hover:shadow-lg hover:from-green-600 hover:to-primary transform hover:-translate-y-0.5;
+  }
 }

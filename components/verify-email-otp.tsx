@@ -5,13 +5,13 @@ import { useState, useRef, useEffect } from "react"
 import Link from "next/link"
 import { useToast } from "@/hooks/use-toast"
 import { useRouter } from "next/navigation"
-import axios from "../store/api/axiosClient" 
+import axios from "../store/api/axiosClient"
 
 interface Props {
   email: string
 }
 
-export default function VerifyOtpForm({ email }: Props) {
+export default function VerifyEmailOtp({ email }: Props) {
   const router = useRouter()
   const { toast } = useToast()
   const [otp, setOtp] = useState<string[]>(["", "", "", "", "", ""])
@@ -74,21 +74,24 @@ export default function VerifyOtpForm({ email }: Props) {
     setIsSubmitting(true)
 
     try {
-      await axios.post("/auth/verify-otp", {
+      const res = await axios.post("/auth/verify-email", {
         otp: otp.join(""),
         email,
       })
 
+      const { status, message } = res.data
+
       toast({
-        title: "Email Verified",
-        description: "Your Email has been verified successfully.",
+        title: status ? "Email Verified" : "Verification Failed",
+        description: message || "Something went wrong.",
+        variant: status ? "default" : "destructive",
       })
 
-      router.push("/login")
-    } catch (error) {
+      if (status) router.push("/login")
+    } catch (error: any) {
       toast({
-        title: "Verification Failed",
-        description: "The OTP you entered is incorrect or has expired.",
+        title: "Error",
+        description: error?.response?.data?.message || "Something went wrong.",
         variant: "destructive",
       })
     } finally {
@@ -98,21 +101,22 @@ export default function VerifyOtpForm({ email }: Props) {
 
   const handleResendOtp = async () => {
     setResendDisabled(true)
-    setCountdown(30)
+    setCountdown(600)
 
     try {
-      await axios.post("/auth/resend-verify-email", {
-        email,
-      })
+      const res = await axios.post("/auth/resend-verify-email", { email })
+
+      const { status, message } = res.data
 
       toast({
-        title: "OTP Resent",
-        description: "A new OTP has been sent to your email address.",
+        title: status ? "OTP Sent" : "Failed",
+        description: message || "Something went wrong.",
+        variant: status ? "default" : "destructive",
       })
-    } catch (error) {
+    } catch (error: any) {
       toast({
         title: "Error",
-        description: "There was a problem sending a new OTP. Please try again.",
+        description: error?.response?.data?.message || "Something went wrong.",
         variant: "destructive",
       })
       setResendDisabled(false)

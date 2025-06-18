@@ -4,8 +4,42 @@ export interface Ingredient {
   name: string
   quantity: string
   unit: string
+  _id?: string
 }
 
+export interface ApiMeal {
+  _id: string
+  name: string
+  time: "breakfast" | "lunch" | "dinner" | "snack"
+  foodPackage: "basic" | "standard" | "premium"
+  description: string
+  image: string
+  ingredients: Ingredient[]
+  price: number
+  availability: string
+  deliveryCharges: number
+  createdAt: string
+  updatedAt: string
+  __v: number
+}
+
+export interface ApiMealsResponse {
+  status: boolean
+  message: string
+  data: {
+    basic: {
+      [day: string]: ApiMeal[]
+    }
+    standard: {
+      [day: string]: ApiMeal[]
+    }
+    premium?: {
+      [day: string]: ApiMeal[]
+    }
+  }
+}
+
+// Legacy interfaces for backward compatibility
 export interface Meal {
   _id: string
   name: string
@@ -43,6 +77,7 @@ export interface MealFilters {
   limit?: number
   sortBy?: string
   sortOrder?: "asc" | "desc"
+  today?: string
 }
 
 export interface WeeklyMenu {
@@ -59,8 +94,8 @@ export interface WeeklyMenu {
 
 export const mealApi = baseApi.injectEndpoints({
   endpoints: (builder) => ({
-    // Get all meals with filters
-    getMeals: builder.query<{ success: boolean; data: Meal[]; pagination: any }, MealFilters>({
+    // Get meals with today filter - Updated to match your API structure
+    getMeals: builder.query<ApiMealsResponse, MealFilters>({
       query: (filters = {}) => {
         const params = new URLSearchParams()
         Object.entries(filters).forEach(([key, value]) => {
@@ -70,6 +105,12 @@ export const mealApi = baseApi.injectEndpoints({
         })
         return `/meals?${params.toString()}`
       },
+      providesTags: ["Meal"],
+    }),
+
+    // Get meals for today specifically
+    getTodayMeals: builder.query<ApiMealsResponse, string>({
+      query: (today) => `/meals?today=${today}`,
       providesTags: ["Meal"],
     }),
 
@@ -134,6 +175,7 @@ export const mealApi = baseApi.injectEndpoints({
 
 export const {
   useGetMealsQuery,
+  useGetTodayMealsQuery,
   useGetMealQuery,
   useGetWeeklyMenuQuery,
   useGetDailyMealsQuery,

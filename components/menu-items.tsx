@@ -128,6 +128,7 @@ interface MenuItemsProps {
 
 export default function MenuItems({ type }: MenuItemsProps) {
   const [quantities, setQuantities] = useState<{ [key: string]: number }>({})
+  const [showIngredientsModal, setShowIngredientsModal] = useState<string | null>(null)
   const menuItems = generateMenuItems(type)
 
   // Group meals by pairs of days (2 days = 4 meals per row)
@@ -194,8 +195,8 @@ export default function MenuItems({ type }: MenuItemsProps) {
                         <p className="text-gray-600 text-sm">{dayDate}</p>
                       </div>
 
-                      {/* Lunch and Dinner Cards for this day */}
-                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                      {/* Lunch and Dinner Cards for this day - 2 columns on mobile, 2 columns on desktop */}
+                      <div className="grid grid-cols-2 gap-4">
                         {dayMeals.map((item) => (
                           <MenuCard
                             key={item.id}
@@ -203,6 +204,8 @@ export default function MenuItems({ type }: MenuItemsProps) {
                             quantity={quantities[item.id] || 1}
                             onUpdateQuantity={updateQuantity}
                             onAddToCart={addToCart}
+                            showIngredientsModal={showIngredientsModal}
+                            setShowIngredientsModal={setShowIngredientsModal}
                           />
                         ))}
                       </div>
@@ -223,97 +226,168 @@ interface MenuCardProps {
   quantity: number
   onUpdateQuantity: (id: string, change: number) => void
   onAddToCart: (item: MenuItem) => void
+  showIngredientsModal: string | null
+  setShowIngredientsModal: (id: string | null) => void
 }
 
-function MenuCard({ item, quantity, onUpdateQuantity, onAddToCart }: MenuCardProps) {
+function MenuCard({ 
+  item, 
+  quantity, 
+  onUpdateQuantity, 
+  onAddToCart, 
+  showIngredientsModal, 
+  setShowIngredientsModal 
+}: MenuCardProps) {
   return (
-    <div className="border border-gray-200 rounded-lg overflow-hidden bg-white shadow-sm hover:shadow-md transition-shadow">
-      {/* Food Image with Meal Type Badge */}
-      <div className="relative">
-        <Image
-          src={item.image || "/placeholder.svg"}
-          alt={item.name}
-          width={300}
-          height={200}
-          className="w-full h-40 object-cover"
-        />
-        <div className="absolute top-2 left-2 bg-primary text-white text-xs px-2 py-1 rounded-full flex items-center gap-1">
-          {item.mealType === "Lunch" ? <Sun size={10} /> : <Moon size={10} />}
-          {item.mealType}
-        </div>
-        <div className="absolute top-2 right-2 bg-red-600 text-white text-xs px-2 py-1 rounded">{item.price}/-</div>
-      </div>
-
-      {/* Menu Details */}
-      <div className="p-3">
-        {/* Meal Type Header */}
-        <div className="text-center mb-3">
-          <p className="text-sm font-bold text-gray-800">{item.mealType}</p>
+    <>
+      <div className="border border-gray-200 rounded-lg overflow-hidden bg-white shadow-sm hover:shadow-md transition-shadow">
+        {/* Food Image with Meal Type Badge */}
+        <div className="relative">
+          <Image
+            src={item.image || "/placeholder.svg"}
+            alt={item.name}
+            width={300}
+            height={200}
+            className="w-full h-32 sm:h-40 object-cover"
+          />
+          <div className="absolute top-2 left-2 bg-primary text-white text-xs px-2 py-1 rounded-full flex items-center gap-1">
+            {item.mealType === "Lunch" ? <Sun size={10} /> : <Moon size={10} />}
+            {item.mealType}
+          </div>
+          <div className="absolute top-2 right-2 bg-red-600 text-white text-xs px-2 py-1 rounded">{item.price}/-</div>
         </div>
 
-        {/* Ingredients with Quantities */}
-        <div className="space-y-1 mb-3">
-          {/* Main Item */}
-          <div className="flex items-center justify-between">
-            <div className="flex items-center">
-              <Check size={10} className="text-primary mr-1" />
-              <span className="text-xs font-medium">{item.items.main.name}</span>
-            </div>
-            <span className="text-xs text-gray-600 bg-gray-100 px-1 py-0.5 rounded">{item.items.main.quantity}</span>
+        {/* Menu Details */}
+        <div className="p-3">
+          {/* Meal Type Header */}
+          <div className="text-center mb-3">
+            <p className="text-sm font-bold text-gray-800">{item.mealType}</p>
           </div>
 
-          {/* Protein */}
-          <div className="flex items-center justify-between">
-            <div className="flex items-center">
-              <Check size={10} className="text-primary mr-1" />
-              <span className="text-xs font-medium">{item.items.protein.name}</span>
-            </div>
-            <span className="text-xs text-gray-600 bg-gray-100 px-1 py-0.5 rounded">{item.items.protein.quantity}</span>
-          </div>
-
-          {/* Sides (show first 2 to save space) */}
-          {item.items.sides.slice(0, 2).map((side, index) => (
-            <div key={index} className="flex items-center justify-between">
+          {/* Ingredients with Quantities - Hidden on mobile, visible on desktop */}
+          <div className="hidden sm:block space-y-1 mb-3">
+            {/* Main Item */}
+            <div className="flex items-center justify-between">
               <div className="flex items-center">
                 <Check size={10} className="text-primary mr-1" />
-                <span className="text-xs font-medium">{side.name}</span>
+                <span className="text-xs font-medium">{item.items.main.name}</span>
               </div>
-              <span className="text-xs text-gray-600 bg-gray-100 px-1 py-0.5 rounded">{side.quantity}</span>
+              <span className="text-xs text-gray-600 bg-gray-100 px-1 py-0.5 rounded">{item.items.main.quantity}</span>
             </div>
-          ))}
-        </div>
 
-        {/* Quantity Controls and Add to Cart in Same Row */}
-        <div className="flex items-center gap-2">
-          {/* Quantity Controls */}
-          <div className="flex items-center border border-gray-300 rounded-md">
+            {/* Protein */}
+            <div className="flex items-center justify-between">
+              <div className="flex items-center">
+                <Check size={10} className="text-primary mr-1" />
+                <span className="text-xs font-medium">{item.items.protein.name}</span>
+              </div>
+              <span className="text-xs text-gray-600 bg-gray-100 px-1 py-0.5 rounded">{item.items.protein.quantity}</span>
+            </div>
+
+            {/* Sides (show first 2 to save space) */}
+            {item.items.sides.slice(0, 2).map((side, index) => (
+              <div key={index} className="flex items-center justify-between">
+                <div className="flex items-center">
+                  <Check size={10} className="text-primary mr-1" />
+                  <span className="text-xs font-medium">{side.name}</span>
+                </div>
+                <span className="text-xs text-gray-600 bg-gray-100 px-1 py-0.5 rounded">{side.quantity}</span>
+              </div>
+            ))}
+          </div>
+
+          {/* View Ingredients Button for Mobile */}
+          <div className="sm:hidden mb-3">
             <button
-              onClick={() => onUpdateQuantity(item.id, -1)}
-              className="px-2 py-1 text-gray-600 hover:bg-gray-100 transition-colors"
+              onClick={() => setShowIngredientsModal(item.id)}
+              className="w-full text-center text-green-600 font-medium py-2 border border-green-600 rounded-md hover:bg-green-50 transition-colors text-xs"
             >
-              <Minus size={12} />
-            </button>
-            <span className="px-2 py-1 border-x border-gray-300 text-xs font-medium min-w-[30px] text-center">
-              {quantity}
-            </span>
-            <button
-              onClick={() => onUpdateQuantity(item.id, 1)}
-              className="px-2 py-1 text-gray-600 hover:bg-gray-100 transition-colors"
-            >
-              <Plus size={12} />
+              View Ingredients
             </button>
           </div>
 
-          {/* Add to Cart Button */}
-          <button
-            onClick={() => onAddToCart(item)}
-            className="flex-1 bg-primary text-white px-2 py-1 rounded-md hover:bg-primary/90 flex items-center justify-center transition-colors text-xs"
-          >
-            <Check size={12} className="mr-1" />
-            Add Cart
-          </button>
+          {/* Quantity Controls and Add to Cart in Same Row */}
+          <div className="flex flex-col sm:flex-row sm:items-center gap-2">
+  {/* Quantity Controls */}
+  <div className="flex items-center border border-gray-300 rounded-md w-full sm:w-1/2">
+    <button
+      onClick={() => onUpdateQuantity(item.id, -1)}
+      className="flex-1 sm:flex-none px-2 py-1 text-gray-600 hover:bg-gray-100 transition-colors"
+    >
+      <Minus size={12} className="mx-auto" />
+    </button>
+    <span className="flex-1 sm:flex-none px-2 py-1 border-x border-gray-300 text-xs font-medium min-w-[30px] text-center">
+      {quantity}
+    </span>
+    <button
+      onClick={() => onUpdateQuantity(item.id, 1)}
+      className="flex-1 sm:flex-none px-2 py-1 text-gray-600 hover:bg-gray-100 transition-colors"
+    >
+      <Plus size={12} className="mx-auto" />
+    </button>
+  </div>
+
+  {/* Add to Cart Button */}
+  <button
+    onClick={() => onAddToCart(item)}
+    className="w-full sm:w-1/2 bg-primary text-white px-2 py-1 rounded-md hover:bg-primary/90 flex items-center justify-center transition-colors text-xs"
+  >
+    <Check size={12} className="mr-1" />
+    Add Cart
+  </button>
+</div>
         </div>
       </div>
-    </div>
+
+      {/* Ingredients Modal for Mobile */}
+      {showIngredientsModal === item.id && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50 sm:hidden">
+          <div className="bg-white rounded-lg p-6 w-full max-w-sm mx-auto">
+            <div className="flex justify-between items-center mb-4">
+              <h3 className="text-lg font-semibold">Ingredients</h3>
+              <button
+                onClick={() => setShowIngredientsModal(null)}
+                className="text-gray-500 hover:text-gray-700 text-xl font-bold"
+              >
+                ×
+              </button>
+            </div>
+            
+            <div className="space-y-3">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center">
+                  <Check size={16} className="text-green-600 mr-2" />
+                  <span>{item.items.main.name}</span>
+                </div>
+                <span className="text-gray-600 text-sm">{item.items.main.quantity}</span>
+              </div>
+              <div className="flex items-center justify-between">
+                <div className="flex items-center">
+                  <Check size={16} className="text-green-600 mr-2" />
+                  <span>{item.items.protein.name}</span>
+                </div>
+                <span className="text-gray-600 text-sm">{item.items.protein.quantity}</span>
+              </div>
+              {item.items.sides.map((side, index) => (
+                <div key={index} className="flex items-center justify-between">
+                  <div className="flex items-center">
+                    <Check size={16} className="text-green-600 mr-2" />
+                    <span>{side.name}</span>
+                  </div>
+                  <span className="text-gray-600 text-sm">{side.quantity}</span>
+                </div>
+              ))}
+            </div>
+            
+            <button
+              onClick={() => setShowIngredientsModal(null)}
+              className="w-full mt-4 bg-green-600 text-white py-2 rounded-md hover:bg-green-700"
+            >
+              Close
+            </button>
+          </div>
+        </div>
+      )}
+    </>
   )
 }
