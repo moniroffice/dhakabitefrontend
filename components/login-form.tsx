@@ -42,16 +42,16 @@ export default function LoginForm() {
 
       console.log("Login result:", result)
 
-      dispatch(
-        setCredentials({
-          user: result.user,
-          token: result.token,
-        }),
-      )
+     dispatch(
+  setCredentials({
+    user: result.data.user,
+    token: result.data.accessToken,
+  })
+)
 
       toast({
         title: "Login successful",
-        description: result.message || "Welcome back to Dhaka Bite!",
+        description: result.data.message || "Welcome back to Dhaka Bite!",
       })
 
       // Redirect to dashboard

@@ -45,6 +45,8 @@ export interface LoginResponse {
   success: boolean
   message: string
   data: {
+    message: string
+    accessToken: string
     user: User
     token: string
   }

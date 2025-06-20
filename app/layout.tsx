@@ -33,7 +33,6 @@ export default function RootLayout({
             <NotificationBar />
             <Navbar />
             <main>{children}</main>
-            <Footer />
             <Toaster />
           </AuthProvider>
         </ReduxProvider>

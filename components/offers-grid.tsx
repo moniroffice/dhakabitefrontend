@@ -1,116 +1,59 @@
-"use client"
+"use client";
 
-import { useState } from "react"
-import { Clock, Star, Tag } from "lucide-react"
+import { useEffect, useState } from "react";
+import { Clock, Star, Tag } from "lucide-react";
+import axiosClient from "@/store/api/axiosClient";
 
 interface Offer {
-  id: number
-  title: string
-  description: string
-  image: string
-  originalPrice: number
-  discountedPrice: number
-  discount: number
-  validUntil: string
-  category: string
-  rating: number
-  isPopular?: boolean
+  _id: string;
+  title: string;
+  description: string;
+  image: string;
+  currentPrice: number;
+  oldPrice: number;
+  discountPercentage: number;
+  expiryDate: string;
+  tag: string;
+  rating: number;
+  badge?: string;
 }
 
-const offers: Offer[] = [
-  {
-    id: 1,
-    title: "Weekend Family Feast",
-    description: "Complete family meal package with rice, curry, fish, and vegetables for 4 people",
-    image: "/curry-rice-fish-bowl.png",
-    originalPrice: 800,
-    discountedPrice: 600,
-    discount: 25,
-    validUntil: "Dec 31, 2024",
-    category: "Family Pack",
-    rating: 4.8,
-    isPopular: true,
-  },
-  {
-    id: 2,
-    title: "Student Special Combo",
-    description: "Affordable meal combo perfect for students with rice, curry, and a side dish",
-    image: "/beef-curry.png",
-    originalPrice: 200,
-    discountedPrice: 150,
-    discount: 25,
-    validUntil: "Dec 25, 2024",
-    category: "Student Deal",
-    rating: 4.5,
-  },
-  {
-    id: 3,
-    title: "Premium Dinner Set",
-    description: "Luxurious dinner experience with premium ingredients and chef's special preparations",
-    image: "/fried-chicken.png",
-    originalPrice: 1200,
-    discountedPrice: 840,
-    discount: 30,
-    validUntil: "Jan 15, 2025",
-    category: "Premium",
-    rating: 4.9,
-    isPopular: true,
-  },
-  {
-    id: 4,
-    title: "Quick Lunch Deal",
-    description: "Fast and delicious lunch option for busy professionals",
-    image: "/sandwich-fries.png",
-    originalPrice: 300,
-    discountedPrice: 225,
-    discount: 25,
-    validUntil: "Dec 30, 2024",
-    category: "Lunch",
-    rating: 4.3,
-  },
-  {
-    id: 5,
-    title: "Healthy Choice Package",
-    description: "Nutritious and balanced meal with fresh vegetables and lean proteins",
-    image: "/food-plate.png",
-    originalPrice: 450,
-    discountedPrice: 360,
-    discount: 20,
-    validUntil: "Jan 10, 2025",
-    category: "Healthy",
-    rating: 4.6,
-  },
-  {
-    id: 6,
-    title: "Midnight Snack Special",
-    description: "Late night comfort food delivery with your favorite snacks and beverages",
-    image: "/fast-food.png",
-    originalPrice: 350,
-    discountedPrice: 280,
-    discount: 20,
-    validUntil: "Dec 28, 2024",
-    category: "Snacks",
-    rating: 4.4,
-  },
-]
-
 export default function OffersGrid() {
-  const [currentPage, setCurrentPage] = useState(1)
-  const offersPerPage = 6
-  const totalPages = Math.ceil(offers.length / offersPerPage)
+  const [offers, setOffers] = useState<Offer[]>([]);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
+  const offersPerPage = 6;
 
-  const startIndex = (currentPage - 1) * offersPerPage
-  const currentOffers = offers.slice(startIndex, startIndex + offersPerPage)
+  const fetchOffers = async (page: number) => {
+    try {
+      const res = await axiosClient.get(`/offers?page=${page}&limit=${offersPerPage}`);
+      setOffers(res.data.data.offers);
+      setTotalPages(res.data.data.pagination.totalPages);
+    } catch (error) {
+      console.error("Failed to load offers:", error);
+    }
+  };
 
-  const handleClaimOffer = (offerId: number) => {
-    // Add to cart or navigate to specific offer page
-    console.log(`Claiming offer ${offerId}`)
-  }
+  useEffect(() => {
+    fetchOffers(currentPage);
+  }, [currentPage]);
+
+  const handleClaimOffer = (offerId: string) => {
+    console.log(`Claiming offer ${offerId}`);
+  };
+
+  const formatDate = (isoDate: string) => {
+    return new Date(isoDate).toLocaleDateString("en-US", {
+      year: "numeric",
+      month: "short",
+      day: "numeric",
+    });
+  };
 
   return (
     <section className="py-16 bg-gray-50">
       <div className="container-custom">
-        {/* Section Header */}
+        {/* Header */}
         <div className="text-center mb-12">
           <h2 className="text-3xl md:text-4xl font-bold text-gray-800 mb-4">Current Offers</h2>
           <p className="text-gray-600 max-w-2xl mx-auto">
@@ -118,14 +61,14 @@ export default function OffersGrid() {
           </p>
         </div>
 
-        {/* Offers Grid */}
+        {/* Offers */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mb-12">
-          {currentOffers.map((offer) => (
+          {offers.map((offer) => (
             <div
-              key={offer.id}
+              key={offer._id}
               className="bg-white rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 overflow-hidden group"
             >
-              {/* Image Container */}
+              {/* Image */}
               <div className="relative h-48 overflow-hidden">
                 <img
                   src={offer.image || "/placeholder.svg"}
@@ -133,13 +76,13 @@ export default function OffersGrid() {
                   className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
                 />
 
-                {/* Discount Badge */}
+                {/* Discount */}
                 <div className="absolute top-4 left-4 bg-secondary text-white px-3 py-1 rounded-full font-bold text-sm">
-                  {offer.discount}% OFF
+                  {offer.discountPercentage}% OFF
                 </div>
 
-                {/* Popular Badge */}
-                {offer.isPopular && (
+                {/* Popular */}
+                {offer.badge === "Popular" && (
                   <div className="absolute top-4 right-4 bg-primary text-white px-3 py-1 rounded-full font-bold text-sm flex items-center gap-1">
                     <Star size={14} fill="currentColor" />
                     Popular
@@ -149,10 +92,9 @@ export default function OffersGrid() {
 
               {/* Content */}
               <div className="p-6">
-                {/* Category & Rating */}
                 <div className="flex items-center justify-between mb-3">
                   <span className="text-primary text-sm font-medium bg-primary/10 px-2 py-1 rounded-full">
-                    {offer.category}
+                    {offer.tag}
                   </span>
                   <div className="flex items-center gap-1 text-yellow-500">
                     <Star size={16} fill="currentColor" />
@@ -160,30 +102,24 @@ export default function OffersGrid() {
                   </div>
                 </div>
 
-                {/* Title */}
                 <h3 className="text-xl font-bold text-gray-800 mb-2">{offer.title}</h3>
-
-                {/* Description */}
                 <p className="text-gray-600 text-sm mb-4 line-clamp-2">{offer.description}</p>
 
-                {/* Pricing */}
                 <div className="flex items-center gap-3 mb-4">
-                  <span className="text-2xl font-bold text-primary">৳{offer.discountedPrice}</span>
-                  <span className="text-gray-400 line-through">৳{offer.originalPrice}</span>
+                  <span className="text-2xl font-bold text-primary">৳{offer.currentPrice}</span>
+                  <span className="text-gray-400 line-through">৳{offer.oldPrice}</span>
                   <span className="text-green-600 text-sm font-medium">
-                    Save ৳{offer.originalPrice - offer.discountedPrice}
+                    Save ৳{offer.oldPrice - offer.currentPrice}
                   </span>
                 </div>
 
-                {/* Validity */}
                 <div className="flex items-center gap-2 text-gray-500 text-sm mb-4">
                   <Clock size={16} />
-                  <span>Valid until {offer.validUntil}</span>
+                  <span>Valid until {formatDate(offer.expiryDate)}</span>
                 </div>
 
-                {/* Action Button */}
                 <button
-                  onClick={() => handleClaimOffer(offer.id)}
+                  onClick={() => handleClaimOffer(offer._id)}
                   className="w-full bg-primary text-white py-3 rounded-lg font-medium hover:bg-primary/90 transition-colors flex items-center justify-center gap-2"
                 >
                   <Tag size={18} />
@@ -230,5 +166,5 @@ export default function OffersGrid() {
         )}
       </div>
     </section>
-  )
+  );
 }

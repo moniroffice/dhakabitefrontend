@@ -4,6 +4,8 @@ import OtherServices from "@/components/other-services"
 import Testimonials from "@/components/testimonials"
 import DeliveryArea from "@/components/delivery-area"
 import type { Metadata } from "next"
+import Footer from "@/components/footer"
+import HeroSection from "@/components/HeroSection"
 
 export const metadata: Metadata = {
   title: "Blogs | Dhaka Bite",
@@ -13,11 +15,16 @@ export const metadata: Metadata = {
 export default function BlogsPage() {
   return (
     <main>
-      <BlogsHero />
+      <HeroSection
+        title="Blogs"
+        description="Read our latest blogs about food, nutrition, and healthy eating habits."
+        backgroundImage="/blogs-hero-bg.jpg"
+      />
       <BlogPosts />
       <OtherServices />
       <Testimonials />
       <DeliveryArea />
+      <Footer />
     </main>
   )
 }

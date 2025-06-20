@@ -23,6 +23,9 @@ export default function Navbar() {
   const dispatch = useDispatch()
 
   const { user, isAuthenticated } = useAuth()
+
+  console.log("user in navbar:", user)
+
   const { totalItems } = useCart()
   const [logoutMutation] = useLogoutMutation()
 
@@ -104,8 +107,8 @@ export default function Navbar() {
               <div className="flex items-center gap-4">
                 <div className="flex items-center gap-2">
                   <div className="w-8 h-8 rounded-full bg-gray-200 flex items-center justify-center overflow-hidden">
-                    {user?.profilePicture ? (
-                      <Image src={user.profilePicture || "/placeholder.svg"} alt={user.name} width={32} height={32} className="w-full h-full object-cover" />
+                    {user?.profileImage ? (
+                      <Image src={user.profileImage || "/placeholder.svg"} alt={user.name || "User"} width={32} height={32} className="w-full h-full object-cover" />
                     ) : (
                       <User size={20} className="text-gray-600" />
                     )}
@@ -167,8 +170,8 @@ export default function Navbar() {
                   <div className="flex items-center justify-between py-2">
                     <div className="flex items-center gap-2">
                       <div className="w-8 h-8 rounded-full bg-gray-200 flex items-center justify-center overflow-hidden">
-                        {user?.profilePicture ? (
-                          <Image src={user.profilePicture || "/placeholder.svg"} alt={user.name} width={32} height={32} className="w-full h-full object-cover" />
+                        {user?.profileImage ? (
+                          <Image src={user.profileImage || "/placeholder.svg"} alt={user.name} width={32} height={32} className="w-full h-full object-cover" />
                         ) : (
                           <User size={20} className="text-gray-600" />
                         )}

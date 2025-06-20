@@ -5,9 +5,10 @@ export default function Footer() {
   return (
     <footer className="bg-primary text-white pt-12 pb-6">
       <div className="container-custom">
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-6 md:gap-8 mb-8">
-          {/* Logo and Description */}
-          <div className="col-span-2 md:col-span-1 text-center md:text-left">
+        {/* Responsive Grid: 1 column mobile, 3 columns desktop */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-8">
+          {/* Column 1: Logo and Description */}
+          <div className="text-center md:text-left">
             <Link href="/" className="inline-block mb-4">
               <span className="text-secondary text-3xl font-bold">dhakabite</span>
             </Link>
@@ -43,9 +44,9 @@ export default function Footer() {
             </div>
           </div>
 
-          {/* Page Links */}
-          <div className="col-span-1">
-            <h3 className="text-lg md:text-xl font-semibold mb-4">Page</h3>
+          {/* Column 2: Page Links */}
+          <div>
+            <h3 className="text-lg md:text-xl font-semibold mb-4">Pages</h3>
             <ul className="space-y-2">
               <li>
                 <Link href="/about" className="text-sm hover:underline transition-colors">
@@ -53,7 +54,7 @@ export default function Footer() {
                 </Link>
               </li>
               <li>
-                <Link href="/contact" className="text-sm hover:underline transition-colors">
+                <Link href="/contact-us" className="text-sm hover:underline transition-colors">
                   Contact Us
                 </Link>
               </li>
@@ -64,7 +65,7 @@ export default function Footer() {
               </li>
               <li>
                 <Link href="/terms" className="text-sm hover:underline transition-colors">
-                  Terms & Condition
+                  Terms & Conditions
                 </Link>
               </li>
               <li>
@@ -75,30 +76,8 @@ export default function Footer() {
             </ul>
           </div>
 
-          {/* Meal Menu */}
-          <div className="col-span-1">
-            <h3 className="text-lg md:text-xl font-semibold mb-4">Meal Menu</h3>
-            <ul className="space-y-2">
-              <li>
-                <Link href="/menu/simple" className="text-sm hover:underline transition-colors">
-                  Simple Menu
-                </Link>
-              </li>
-              <li>
-                <Link href="/menu/standard" className="text-sm hover:underline transition-colors">
-                  Standard Menu
-                </Link>
-              </li>
-              <li>
-                <Link href="/menu/premium" className="text-sm hover:underline transition-colors">
-                  Premium Menu
-                </Link>
-              </li>
-            </ul>
-          </div>
-
-          {/* Address */}
-          <div className="col-span-2 md:col-span-1 text-center md:text-left">
+          {/* Column 3: Address */}
+          <div className="text-center md:text-left">
             <h3 className="text-lg md:text-xl font-semibold mb-4">Address</h3>
             <ul className="space-y-2">
               <li className="text-sm">
@@ -116,6 +95,7 @@ export default function Footer() {
           </div>
         </div>
 
+        {/* Bottom copyright */}
         <div className="border-t border-white/20 pt-6 text-center text-sm text-gray-300">
           <p>© {new Date().getFullYear()} Dhaka Bite. All rights reserved.</p>
         </div>

@@ -1,7 +1,9 @@
-import NotificationBar from "@/components/notification-bar"
-import Navbar from "@/components/navbar"
-import TermsContent from "@/components/terms-content"
+import DeliveryArea from "@/components/delivery-area"
 import Footer from "@/components/footer"
+import HeroSection from "@/components/HeroSection"
+import OtherServices from "@/components/other-services"
+import TermsContent from "@/components/terms-content"
+import Testimonials from "@/components/testimonials"
 import type { Metadata } from "next"
 
 export const metadata: Metadata = {
@@ -12,13 +14,17 @@ export const metadata: Metadata = {
 export default function TermsPage() {
   return (
     <main>
-      <NotificationBar />
-      <Navbar />
-      <div className="py-12 bg-white">
-        <div className="container-custom">
-          <TermsContent />
-        </div>
-      </div>
+      {/* Move Hero OUTSIDE container to go full width */}
+      <HeroSection
+        title="Terms & Conditions"
+        description="Review the terms and conditions before using DhakaBite’s food delivery service."
+        backgroundImage="/blogs-hero-bg.jpg"
+      />
+
+      <TermsContent />
+      <OtherServices />
+      <Testimonials />
+      <DeliveryArea />
       <Footer />
     </main>
   )
