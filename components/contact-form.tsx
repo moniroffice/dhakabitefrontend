@@ -1,10 +1,10 @@
 "use client"
 
 import type React from "react"
-
 import { useState } from "react"
 import { useToast } from "@/hooks/use-toast"
 import { Phone, Mail, MapPin } from "lucide-react"
+import axiosClient from "@/store/api/axiosClient" // ✅ Import axios
 
 export default function ContactForm() {
   const { toast } = useToast()
@@ -30,15 +30,8 @@ export default function ContactForm() {
     setIsSubmitting(true)
 
     try {
-      // In a real app, this would be an API call to your backend
-      // await fetch('/api/contact', {
-      //   method: 'POST',
-      //   headers: { 'Content-Type': 'application/json' },
-      //   body: JSON.stringify(formData)
-      // });
-
-      // Simulate API call
-      await new Promise((resolve) => setTimeout(resolve, 1000))
+      // ✅ Real API call
+      await axiosClient.post("/contact-us", formData)
 
       toast({
         title: "Message Sent",

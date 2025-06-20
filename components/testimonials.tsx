@@ -1,55 +1,42 @@
 "use client"
 
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import Image from "next/image"
 import { ChevronLeft, ChevronRight } from "lucide-react"
+import axiosClient from "@/store/api/axiosClient"
 
 interface Testimonial {
-  id: number
-  name: string
-  role: string
-  avatar: string
+  _id: string
+  userId: {
+    _id: string
+    name: string
+    profileImage: string
+  }
+  review: string
   rating: number
-  text: string
 }
 
-const testimonials: Testimonial[] = [
-  {
-    id: 1,
-    name: "Sadia Rahman",
-    role: "Student",
-    avatar: "/avatar-female.png",
-    rating: 5,
-    text: "Lorem ipsum dolor sit amet consectetur. Tempor diam tortor integer placerat. Nulla tellus.",
-  },
-  {
-    id: 2,
-    name: "Sadia Rahman",
-    role: "Student",
-    avatar: "/avatar-female.png",
-    rating: 5,
-    text: "Lorem ipsum dolor sit amet consectetur. Tempor diam tortor integer placerat. Nulla tellus.",
-  },
-  {
-    id: 3,
-    name: "Sadia Rahman",
-    role: "Student",
-    avatar: "/avatar-female.png",
-    rating: 5,
-    text: "Lorem ipsum dolor sit amet consectetur. Tempor diam tortor integer placerat. Nulla tellus.",
-  },
-  {
-    id: 4,
-    name: "Sadia Rahman",
-    role: "Student",
-    avatar: "/avatar-female.png",
-    rating: 5,
-    text: "Lorem ipsum dolor sit amet consectetur. Tempor diam tortor integer placerat. Nulla tellus.",
-  },
-]
-
 export default function Testimonials() {
+  const [testimonials, setTestimonials] = useState<Testimonial[]>([])
   const [activeIndex, setActiveIndex] = useState(0)
+  const [loading, setLoading] = useState(true)
+
+  useEffect(() => {
+    const fetchTestimonials = async () => {
+      try {
+        const res = await axiosClient.get("/review-rating/latest-accepted")
+        if (res.data.status) {
+          setTestimonials(res.data.data || [])
+        }
+      } catch (err) {
+        console.error("Failed to fetch testimonials:", err)
+      } finally {
+        setLoading(false)
+      }
+    }
+
+    fetchTestimonials()
+  }, [])
 
   const nextSlide = () => {
     setActiveIndex((current) => (current === testimonials.length - 1 ? 0 : current + 1))
@@ -63,16 +50,21 @@ export default function Testimonials() {
     setActiveIndex(index)
   }
 
-  // Calculate visible testimonials (show 3 on desktop, 1 on mobile)
   const visibleTestimonials = () => {
-    // This is a simplified approach - in a real implementation you'd use CSS and responsive design
-    // to handle this more elegantly
     const result = []
-    for (let i = 0; i < 3; i++) {
+    for (let i = 0; i < 3 && i < testimonials.length; i++) {
       const index = (activeIndex + i) % testimonials.length
       result.push(testimonials[index])
     }
     return result
+  }
+
+  if (loading) {
+    return <p className="text-center py-10">Loading testimonials...</p>
+  }
+
+  if (!testimonials.length) {
+    return <p className="text-center py-10">No testimonials found.</p>
   }
 
   return (
@@ -82,7 +74,7 @@ export default function Testimonials() {
           <div>
             <h2 className="text-lg font-medium text-primary mb-2">Testimonial</h2>
             <h3 className="text-3xl font-bold">
-              100 Customers <br />
+              {testimonials.length} Customers <br />
               Gave Their Feedback
             </h3>
           </div>
@@ -105,14 +97,19 @@ export default function Testimonials() {
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           {visibleTestimonials().map((testimonial) => (
-            <div key={testimonial.id} className="bg-white p-6 rounded-lg shadow-sm">
+            <div key={testimonial._id} className="bg-white p-6 rounded-lg shadow-sm">
               <div className="flex items-center mb-4">
                 <div className="w-10 h-10 rounded-full overflow-hidden mr-3">
-                  <Image src={testimonial.avatar || "/placeholder.svg"} alt={testimonial.name} width={40} height={40} />
+                  <Image
+                    src={testimonial?.userId?.profileImage || "/placeholder.svg"}
+                    alt={testimonial?.userId?.name || "User"}
+                    width={40}
+                    height={40}
+                  />
                 </div>
                 <div>
-                  <h4 className="font-semibold">{testimonial.name}</h4>
-                  <p className="text-sm text-gray-600">{testimonial.role}</p>
+                  <h4 className="font-semibold">{testimonial?.userId?.name || "Unknown User"}</h4>
+                  <p className="text-sm text-gray-600">Customer</p>
                 </div>
               </div>
 
@@ -129,7 +126,7 @@ export default function Testimonials() {
                 ))}
               </div>
 
-              <p className="text-gray-700">{testimonial.text}</p>
+              <p className="text-gray-700">{testimonial.review}</p>
             </div>
           ))}
         </div>

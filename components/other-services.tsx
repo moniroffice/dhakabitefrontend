@@ -2,49 +2,36 @@
 
 import Image from "next/image"
 import Link from "next/link"
+import { useEffect, useState } from "react"
 import { useRouter } from "next/navigation"
+import axiosClient from "@/store/api/axiosClient"
+
 
 interface ServiceCategory {
-  id: string
-  title: string
+  _id: string
+  packageName: string
   image: string
-  link: string
   description: string
 }
 
-const serviceCategories: ServiceCategory[] = [
-  {
-    id: "prebooking",
-    title: "Prebooking",
-    image: "/catering.png",
-    link: "/prebooking",
-    description: "Pre-order your meals for special events or future dates",
-  },
-  {
-    id: "fast-food",
-    title: "Fast Food",
-    image: "/fast-food.png",
-    link: "/services/fast-food",
-    description: "Quick and delicious burgers, pizzas, and more",
-  },
-  {
-    id: "snacks",
-    title: "Snacks",
-    image: "/snacks.png",
-    link: "/services/snacks",
-    description: "Light bites and appetizers for any occasion",
-  },
-  {
-    id: "combo",
-    title: "Combo Meals",
-    image: "/food-plate.png",
-    link: "/services/combo",
-    description: "Value meal combinations with drinks and sides",
-  },
-]
-
 export default function OtherServices() {
+  const [categories, setCategories] = useState<ServiceCategory[]>([])
   const router = useRouter()
+
+  useEffect(() => {
+    const fetchCategories = async () => {
+      try {
+        const res = await axiosClient.get("/other-package")
+        if (res.data.status) {
+          setCategories(res.data.data)
+        }
+      } catch (err) {
+        console.error("Failed to fetch services:", err)
+      }
+    }
+
+    fetchCategories()
+  }, [])
 
   return (
     <section className="py-12 md:py-20 bg-gradient-to-br from-green-50 to-white">
@@ -58,28 +45,53 @@ export default function OtherServices() {
         </p>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
-          {serviceCategories.map((category) => (
+          {/* ✅ Hardcoded Prebooking Card */}
+          <div
+            className="bg-white rounded-2xl shadow-lg overflow-hidden cursor-pointer transform transition-transform hover:scale-105 border border-gray-100"
+            onClick={() => router.push("/prebooking")}
+          >
+            <div className="relative h-48 w-full overflow-hidden">
+              <Image src="/catering.png" alt="Prebooking" fill className="object-cover" />
+              <div className="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent flex items-end">
+                <h3 className="text-xl font-bold text-white p-4">Prebooking</h3>
+              </div>
+            </div>
+            <div className="p-4">
+              <p className="text-gray-600 text-sm mb-4">
+                Pre-order your meals for special events or future dates
+              </p>
+              <Link
+                href="/prebooking"
+                className="bg-gradient-to-r from-primary to-green-600 text-white px-4 py-2 rounded-lg hover:from-green-600 hover:to-primary transition-all duration-300 inline-block w-full text-center font-semibold"
+              >
+                View Prebooking
+              </Link>
+            </div>
+          </div>
+
+          {/* ✅ Dynamic cards from backend */}
+          {categories.map((category) => (
             <div
-              key={category.id}
+              key={category._id}
               className="bg-white rounded-2xl shadow-lg overflow-hidden cursor-pointer transform transition-transform hover:scale-105 border border-gray-100"
-              onClick={() => router.push(category.link)}
+              onClick={() =>
+                router.push(`/services/${category.packageName.toLowerCase().replace(/\s+/g, "-")}`)
+              }
             >
-              {/* Image */}
               <div className="relative h-48 w-full overflow-hidden">
-                <Image src={category.image || "/placeholder.svg"} alt={category.title} fill className="object-cover" />
+                <Image src={category.image} alt={category.packageName} fill className="object-cover" />
                 <div className="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent flex items-end">
-                  <h3 className="text-xl font-bold text-white p-4">{category.title}</h3>
+                  <h3 className="text-xl font-bold text-white p-4">{category.packageName}</h3>
                 </div>
               </div>
 
-              {/* Content */}
               <div className="p-4">
-                <p className="text-gray-600 text-sm mb-4">{category.description}</p>
+                <p className="text-gray-600 text-sm mb-4">{category.description.length > 60 ? `${category.description.slice(0, 60)}...` : category.description}</p>
                 <Link
-                  href={category.link}
+                  href={`/services/${category.packageName.toLowerCase().replace(/\s+/g, "-")}`}
                   className="bg-gradient-to-r from-primary to-green-600 text-white px-4 py-2 rounded-lg hover:from-green-600 hover:to-primary transition-all duration-300 inline-block w-full text-center font-semibold"
                 >
-                  View {category.title}
+                  View {category.packageName}
                 </Link>
               </div>
             </div>
